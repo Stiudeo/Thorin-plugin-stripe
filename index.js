@@ -8,6 +8,7 @@ module.exports = function(thorin, opt, pluginName) {
     secretKey: process.env.STRIPE_SECRET_KEY,
     publishKey: process.env.STRIPE_PUBLISH_KEY,
     store: 'sql', // the sql store to use.
+    mode: ['subscription'], // the modes we will run the plugin, If no mode is set, we will not setup any db and will only be able to charge.
     accountModel: 'account',   // the db entity we use to attach the subscription.
     planModel: 'stripe_plan', // the db entity we use for plan definition
     subscriptionModel: 'stripe_subscription',  // the db entity we use for subscription definition
@@ -22,7 +23,6 @@ module.exports = function(thorin, opt, pluginName) {
 
   /* Wrapper for db setup */
   pluginObj.setup = function(done) {
-    db.setup();
     initSync(thorin, opt, stripe);
     done();
   }
