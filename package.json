@@ -1,0 +1,19 @@
+{
+  "name": "thorin-plugin-stripe",
+  "author": "Stiudeo",
+  "version": "1.0.1",
+  "dependencies": {
+    "stripe": "^4.7.0"
+  },
+  "description": "Thorin.js plugin for stripe payment integration",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Stiudeo/Thorin-plugin-stripe"
+  },
+  "homepage": "http://thorinjs.com",
+  "bugs": {
+    "url": "https://github.com/Stiudeo/Thorin-plugin-stripe/issues"
+  }
+}
