@@ -1,24 +1,39 @@
 'use strict';
 const initModels = require('./lib/initModels'),
   initSync = require('./lib/syncPlans'),
+  initActions = require('./lib/initActions'),
+  initHooker = require('./lib/eventHook'),
   stripeApi = require('stripe');
 module.exports = function(thorin, opt, pluginName) {
+  const async = thorin.util.async;
   opt = thorin.util.extend({
     logger: pluginName || 'stripe',
     secretKey: process.env.STRIPE_SECRET_KEY,
     publishKey: process.env.STRIPE_PUBLISH_KEY,
+    appName: 'Stripe app',    // your application name, that will appear in all descriptions
     store: 'sql', // the sql store to use.
     mode: ['subscription'], // the modes we will run the plugin, If no mode is set, we will not setup any db and will only be able to charge.
-    accountModel: 'account',   // the db entity we use to attach the subscription.
-    planModel: 'stripe_plan', // the db entity we use for plan definition
-    subscriptionModel: 'stripe_subscription',  // the db entity we use for subscription definition
-    chargeModel: 'stripe_charge',             // the db entity that contains all the stripe charges for a subscription.
-    customerField: 'stripe_customer_id'       // the field where we store the customer's stripe ID
+    models: {
+      account: 'account', // the db entity we use to attach the subscription.
+      plan: 'stripe_plan',  // the db entity we use for plan definition
+      subscription: 'stripe_subscription',  // the db entity we use for subscription definition
+      charge: 'stripe_charge' // the db entity that contains all the stripe charges for a subscription.
+    },
+    fields: {
+      customer: 'stripe_customer_key'  // the field where we store the customer's stripe ID
+    },
+    defaultPlan: null,  // The default plan code, when downgrading an account, we will update its plan to this one (the free plan)
+    webhook: {
+      path: '/webhook/stripe',  // the webhook path
+      ips: []                   // array of source IPs from stripe, which we use to allow webhooks.
+    }
   }, opt);
 
   const pluginObj = {},
-    db = initModels(thorin, opt),
-    stripe = stripeApi(opt.secretKey);
+    stripe = stripeApi(opt.secretKey),
+    hooker = initHooker(thorin, opt),
+    db = initModels(thorin, opt, stripe),
+    act = initActions(thorin, opt, stripe);
 
 
   /* Wrapper for db setup */
@@ -26,6 +41,20 @@ module.exports = function(thorin, opt, pluginName) {
     initSync(thorin, opt, stripe);
     done();
   }
+
+  /* Run the plugin */
+  pluginObj.run = function(done) {
+    const calls = [];
+    calls.push((done) => act.run(done));
+    async.series(calls, done);
+  }
+
+  /* Register a custom hook handler */
+  pluginObj.addHook = hooker.addHook.bind(hooker);
+
+  /* Expose the stripe instance */
+  pluginObj.stripe = stripe;
+
 
   return pluginObj;
 }
