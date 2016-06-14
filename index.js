@@ -22,6 +22,10 @@ module.exports = function(thorin, opt, pluginName) {
     fields: {
       customer: 'stripe_customer_key'  // the field where we store the customer's stripe ID
     },
+    invoice: {
+      prefix: '', // the prefix of the invoice number. Eg: S000001
+      length: 6   // the number of chars the invoice number has. Eg, length=6 => S000012
+    },
     defaultPlan: null,  // The default plan code, when downgrading an account, we will update its plan to this one (the free plan)
     webhook: {
       path: '/webhook/stripe',  // the webhook path
@@ -30,6 +34,7 @@ module.exports = function(thorin, opt, pluginName) {
   }, opt);
 
   const pluginObj = {},
+    logger = thorin.logger(opt.logger),
     stripe = stripeApi(opt.secretKey),
     hooker = initHooker(thorin, opt),
     db = initModels(thorin, opt, stripe),
@@ -39,6 +44,7 @@ module.exports = function(thorin, opt, pluginName) {
   /* Wrapper for db setup */
   pluginObj.setup = function(done) {
     initSync(thorin, opt, stripe);
+    logger.info(`Add stripe webhook with endpoint: ${opt.webhook.path}`)
     done();
   }
 
