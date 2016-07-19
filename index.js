@@ -13,6 +13,7 @@ module.exports = function(thorin, opt, pluginName) {
     appName: 'Stripe app',    // your application name, that will appear in all descriptions
     store: 'sql', // the sql store to use.
     mode: ['subscription'], // the modes we will run the plugin, If no mode is set, we will not setup any db and will only be able to charge.
+    singleSubscription: true, // if set, we will tie the account to a plan.
     models: {
       account: 'account', // the db entity we use to attach the subscription.
       plan: 'stripe_plan',  // the db entity we use for plan definition
@@ -39,7 +40,7 @@ module.exports = function(thorin, opt, pluginName) {
     hooker = initHooker(thorin, opt),
     db = initModels(thorin, opt, stripe),
     act = initActions(thorin, opt, stripe);
-
+  thorin.loadPath(__dirname + '/lib/api', thorin, opt, stripe, pluginObj);
 
   /* Wrapper for db setup */
   pluginObj.setup = function(done) {
