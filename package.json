@@ -1,9 +1,9 @@
 {
   "name": "thorin-plugin-stripe",
   "author": "Stiudeo",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "dependencies": {
-    "stripe": "^4.7.0"
+    "stripe": "4.9.0"
   },
   "description": "Thorin.js plugin for stripe payment integration",
   "main": "index.js",
