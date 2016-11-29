@@ -1,9 +1,9 @@
 {
   "name": "thorin-plugin-stripe",
-  "author": "Stiudeo",
-  "version": "1.0.10",
+  "author": "UNLOQ Systems LTD",
+  "version": "1.0.11",
   "dependencies": {
-    "stripe": "4.9.0"
+    "stripe": "4.13.0"
   },
   "description": "Thorin.js plugin for stripe payment integration",
   "main": "index.js",
